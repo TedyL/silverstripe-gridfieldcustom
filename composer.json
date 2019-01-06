@@ -1,0 +1,28 @@
+{
+	"name": "tedy/gridfieldcustom",
+	"description": "Gridfield extensions to add checkboxes for each row to easily delete or perform actions on multiple rows.",
+	"type": "silverstripe-vendormodule",
+	"keywords": ["silverstripe", "gridfield", "multiselect", "checkboxes", "modeladmin"],
+	"license": "MIT",
+	"authors": [{
+		"name": "Tedy",
+		"email": "tedyjd@gmail.com",
+		"homepage": "http://tedyjd.com"
+	}],
+	"require": {
+		"silverstripe/framework": "~4.0",
+		"silverstripe/vendor-plugin": "^1.0"
+	},
+	"autoload": {
+		"psr-4": {
+			"Tedy\\GridFieldCustom\\": "src/",
+			"Tedy\\GridFieldCustom\\Tests\\": "tests/"
+		}
+	},
+	"extra": {
+		"installer-name": "gridfieldcustom",
+        "expose": [
+            "javascript"
+        ]
+	}
+}
