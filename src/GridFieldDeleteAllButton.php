@@ -28,15 +28,15 @@ class GridFieldDeleteAllButton implements GridField_HTMLProvider, GridField_Acti
 
     //TargetFragment is just for positioning control of the HTML fragment
     //SomeCustomConstructData is just an example of providing some default options into your butotn
-    public function __construct($targetFragment = "after", $someCustomConstructData = null, $buttonConfig = array())
+    public function __construct($targetFragment = "after", $someCustomConstructData = null, $buttonConfig = [])
     {
         $this->targetFragment = $targetFragment;
         $this->someCustomConstructData = $someCustomConstructData;
-        $this->buttonConfig = array(
+        $this->buttonConfig = [
           'icon'    => 'delete',
           'class'   => 'btn btn-danger mt-2 btn-outline font-icon-trash-bin btn--icon-large',
           'confirm' => _t(__CLASS__ . '.Confirm', 'Are you sure you want to delete all items?'),
-            );
+        ];
         Requirements::javascript('tedy/gridfieldcustom:javascript/GridFieldDeleteAllButton.js');
     }
 
@@ -62,10 +62,10 @@ class GridFieldDeleteAllButton implements GridField_HTMLProvider, GridField_Acti
         if (!empty($this->buttonConfig['confirm'])) {
             $button->setAttribute('data-confirm', $this->buttonConfig['confirm']);
         }
-        return array(
+        return [
             //Note: "grid-print-button" is used here to match the styling of the buttons in ModelAdmin
             $this->targetFragment => $button->Field(),
-        );
+        ];
     }
 
     /**
@@ -73,7 +73,7 @@ class GridFieldDeleteAllButton implements GridField_HTMLProvider, GridField_Acti
      */
     public function getActions($gridField)
     {
-        return array('mycustomaction');
+        return ['mycustomaction'];
     }
 
     public function handleAction(GridField $gridField, $actionName, $arguments, $data)
@@ -86,9 +86,7 @@ class GridFieldDeleteAllButton implements GridField_HTMLProvider, GridField_Acti
     //For accessing the custom action from the URL
     public function getURLHandlers($gridField)
     {
-        return array(
-            'myCustomAction' => 'handleMyCustomAction',
-        );
+        return ['myCustomAction' => 'handleMyCustomAction'];
     }
 
     //Handle the custom action, for both the action button and the URL
@@ -98,12 +96,12 @@ class GridFieldDeleteAllButton implements GridField_HTMLProvider, GridField_Acti
         if ($data instanceof HTTPRequest) {
             $data = $data->requestVars();
         }
-        $ids = array();
+        $ids = [];
         $class = $gridField->getModelClass();
         if (!$class) {
             user_error('No model class is defined!');
         }
-        $response = array();
+        $response = [];
         $this->onBeforeList($gridField, $data, $ids);
         $records = DataObject::get($class);
         foreach ($records as $index => $record) {

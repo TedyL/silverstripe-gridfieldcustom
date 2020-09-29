@@ -2,6 +2,8 @@
 
 namespace Tedy\GridFieldCustom;
 
+use Tedy\GridFieldCustom\GridFieldApplyToMultipleRows;
+
 /**
  *
  * @author Tedy Lim <tedyjd@gmail.com>
@@ -16,12 +18,17 @@ class GridFieldMultiDeleteButton extends GridFieldApplyToMultipleRows
      */
     public function __construct($targetFragment = 'after')
     {
-        parent::__construct('deleteselected', _t(__CLASS__ . '.ButtonText', 'Delete Selected'), array($this, 'deleteRecord'), $targetFragment, array(
-            'class'   => 'btn btn-outline-danger mt-2 font-icon-trash-bin btn--icon-large',
-            'confirm' => _t(__CLASS__ . '.Confirm', 'Are you sure you want to delete all selected items?'),
-        ));
+        parent::__construct(
+            'deleteselected',
+            _t(__CLASS__ . '.ButtonText', 'Delete Selected'),
+            [$this, 'deleteRecord'],
+            $targetFragment,
+            [
+                'class'   => 'btn btn-outline-danger mt-2 font-icon-trash-bin btn--icon-large',
+                'confirm' => _t(__CLASS__ . '.Confirm', 'Are you sure you want to delete all selected items?'),
+            ]
+        );
     }
-
 
     /**
      * @param DataObject $record

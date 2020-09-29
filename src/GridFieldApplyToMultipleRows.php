@@ -11,6 +11,8 @@ use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataObject;
 use Tedy\GridFieldCustom\GridFieldCheckboxSelectComponent;
 use SilverStripe\Control\HTTPRequest;
+use SilverStripe\Control\HTTPResponse;
+use SilverStripe\ORM\SS_List;
 
 /**
  *
@@ -44,7 +46,7 @@ class GridFieldApplyToMultipleRows implements GridField_HTMLProvider, GridField_
      * @param string $targetFragment
      * @param array $buttonConfig - icon, class, possibly others
      */
-    public function __construct($actionName, $text, $rowHandler, $targetFragment = 'after', $buttonConfig = array())
+    public function __construct($actionName, $text, $rowHandler, $targetFragment = 'after', $buttonConfig = [])
     {
         $this->actionName = $actionName;
         $this->buttonText = $text;
@@ -74,9 +76,7 @@ class GridFieldApplyToMultipleRows implements GridField_HTMLProvider, GridField_
             $button->setAttribute('data-confirm', $this->buttonConfig['confirm']);
         }
 
-        return array(
-            $this->targetFragment => $button->Field(),
-        );
+        return [$this->targetFragment => $button->Field()];
     }
 
     /**
@@ -84,7 +84,7 @@ class GridFieldApplyToMultipleRows implements GridField_HTMLProvider, GridField_
      */
     public function getActions($gridField)
     {
-        return array($this->actionName);
+        return [$this->actionName];
     }
 
     /**
@@ -102,18 +102,16 @@ class GridFieldApplyToMultipleRows implements GridField_HTMLProvider, GridField_
      */
     public function getURLHandlers($gridField)
     {
-        return array(
-            $this->actionName => 'handleIt'
-        );
+        return [$this->actionName => 'handleIt'];
     }
 
 
     /**
      * @param GridField $gridField
-     * @param array|SS_HTTPRequest $data
+     * @param array|HTTPRequest $data
      * @return array
      */
-    public function handleIt($gridField, $data = array())
+    public function handleIt($gridField, $data = [])
     {
         if ($data instanceof HTTPRequest) {
             $data = $data->requestVars();
@@ -121,13 +119,13 @@ class GridFieldApplyToMultipleRows implements GridField_HTMLProvider, GridField_
 
         // Separate out the ID list from the checkboxes
         $fieldName = GridFieldCheckboxSelectComponent::CHECKBOX_COLUMN;
-        $ids = isset($data[$fieldName]) && is_array($data[$fieldName]) ? $data[$fieldName] : array();
+        $ids = isset($data[$fieldName]) && is_array($data[$fieldName]) ? $data[$fieldName] : [];
         $class = $gridField->getModelClass();
         if (!$class) {
             user_error('No model class is defined!');
         }
 
-        $response = array();
+        $response = [];
 
         // Hook for subclasses
         $this->onBeforeList($gridField, $data, $ids);
@@ -163,7 +161,7 @@ class GridFieldApplyToMultipleRows implements GridField_HTMLProvider, GridField_
      * all the items. Response will usually be an array on the way in
      * but it can be changed to whatever and will be returned as is.
      * @param GridField $gridField
-     * @param array|SS_HTTPResponse $response
+     * @param array|HTTPResponse $response
      * @param SS_List $records
      * @param array $data
      * @param array $idList
@@ -175,7 +173,7 @@ class GridFieldApplyToMultipleRows implements GridField_HTMLProvider, GridField_
 
     /**
      * @param GridField $gridField
-     * @param array|SS_HTTPResponse $response
+     * @param array|HTTPResponse $response
      * @param array $data
      * @param array $idList
      */

@@ -2,9 +2,9 @@
 
 namespace Tedy\GridFieldCustom;
 
-use SilverStripe\Forms\GridField\GridField_ColumnProvider;
 use SilverStripe\View\Requirements;
 use SilverStripe\Core\Config\Config;
+use SilverStripe\Forms\GridField\GridField_ColumnProvider;
 
  /**
   * Gives each row a checkbox which can be paired with various
@@ -61,7 +61,7 @@ class GridFieldCheckboxSelectComponent implements GridField_ColumnProvider
      */
     public function getColumnsHandled($gridField)
     {
-        return array(self::CHECKBOX_COLUMN);
+        return [self::CHECKBOX_COLUMN];
     }
 
 
@@ -97,10 +97,10 @@ class GridFieldCheckboxSelectComponent implements GridField_ColumnProvider
     {
         if ($column === self::CHECKBOX_COLUMN) {
             $title = _t(__CLASS__ . '.SelectAllVisibleRows', 'Select all visible rows');
-            return array(
+            return [
                 'title' => '<input class="multiselect-all no-change-track" type="checkbox"
 								title="' . htmlentities($title) . '">',
-            );
+            ];
         }
     }
 
@@ -115,6 +115,6 @@ class GridFieldCheckboxSelectComponent implements GridField_ColumnProvider
      */
     public function getColumnAttributes($gridField, $record, $columnName)
     {
-        return array('class' => 'col-checkbox');
+        return ['class' => 'col-checkbox'];
     }
 }
