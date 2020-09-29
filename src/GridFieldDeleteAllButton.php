@@ -9,10 +9,11 @@ use SilverStripe\Forms\GridField\GridField_ColumnProvider;
 use SilverStripe\Forms\GridField\GridField_FormAction;
 use SilverStripe\Forms\GridField\GridField_HTMLProvider;
 use SilverStripe\Forms\GridField\GridField_URLHandler;
-use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\View\Requirements;
 use SilverStripe\Control\HTTPRequest;
+use SilverStripe\Security\Security;
+use Tedy\GridFieldCustom\GridFieldDeleteAllTask;
 
 /**
  *
@@ -24,7 +25,15 @@ use SilverStripe\Control\HTTPRequest;
 class GridFieldDeleteAllButton implements GridField_HTMLProvider, GridField_ActionProvider, GridField_URLHandler
 {
     protected $targetFragment;
+
     protected $someCustomConstructData;
+
+    protected $message;
+    
+    protected $status = 'good';
+
+    // Set to less than 0 to never use queuedjob
+    protected $use_queued_threshold = 50;
 
     //TargetFragment is just for positioning control of the HTML fragment
     //SomeCustomConstructData is just an example of providing some default options into your butotn
@@ -92,7 +101,10 @@ class GridFieldDeleteAllButton implements GridField_HTMLProvider, GridField_Acti
     //Handle the custom action, for both the action button and the URL
     public function handleMyCustomAction($gridField, $data = null)
     {
-        //Do your stuff here!
+        $controller = $gridField->getForm()->getController();
+        $response = $controller->getResponse();
+        $parent = $controller->currentPage();
+
         if ($data instanceof HTTPRequest) {
             $data = $data->requestVars();
         }
@@ -101,9 +113,35 @@ class GridFieldDeleteAllButton implements GridField_HTMLProvider, GridField_Acti
         if (!$class) {
             user_error('No model class is defined!');
         }
-        $response = [];
+         
         $this->onBeforeList($gridField, $data, $ids);
         $records = DataObject::get($class);
+        $count = $records->count();
+
+        if ($this->use_queued_threshold >= 0 && $count > $this->use_queued_threshold) {
+            $user = Security::getCurrentUser();
+
+            $request = $controller->getRequest();
+            $request->offsetSet('class', $class);
+            $request->offsetSet('email', $user->Email);
+            $request->offsetUnset($records->dataClass());
+        
+            singleton(GridFieldDeleteAllTask::class)->run($request);
+
+            $this->message = sprintf(
+                'As more than %s records have to be deleted, a job as been queued in the background. '.
+                ' You will get an email when the task is complete.',
+                "{$this->use_queued_threshold}"
+            );
+
+            $this->status = 'warning';
+            
+            $response->setStatusCode(200, $this->message);
+
+            return;
+        }
+
+        // Otherwise start deleting straight away (may time out)
         foreach ($records as $index => $record) {
             if ($record->hasExtension('Versioned')) {
                 $record->deleteFromStage('Stage');
@@ -112,8 +150,14 @@ class GridFieldDeleteAllButton implements GridField_HTMLProvider, GridField_Acti
                 $record->delete();
             }
         }
-        //$this->onAfterList($gridField, $response, $records, $data, $ids);
-        return $response;
+
+        $this->message = sprintf('%s records have been successfully deleted.', "{$count}");
+        $this->status = 'good';
+        
+        
+        $response->setStatusCode(200, $this->message);
+
+        return;
     }
 
     protected function onBeforeList($gridField, $data, $idList)
