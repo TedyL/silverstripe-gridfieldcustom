@@ -12,6 +12,8 @@ use SilverStripe\Forms\GridField\GridField_URLHandler;
 use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\View\Requirements;
+use SilverStripe\Control\HTTPRequest;
+
 /**
  *
  * @author Tedy Lim<tedyjd@gmail.com>
@@ -33,8 +35,8 @@ class GridFieldDeleteAllButton implements GridField_HTMLProvider, GridField_Acti
         $this->buttonConfig = array(
           'icon'    => 'delete',
           'class'   => 'btn btn-danger mt-2 btn-outline font-icon-trash-bin btn--icon-large',
-          'confirm' => _t('GridFieldMultiDeleteButton.Confirm', 'Are you sure you want to delete all items?'),
-    		);
+          'confirm' => _t(__CLASS__ . '.Confirm', 'Are you sure you want to delete all items?'),
+            );
         Requirements::javascript('tedy/gridfieldcustom:javascript/GridFieldDeleteAllButton.js');
     }
 
@@ -51,12 +53,10 @@ class GridFieldDeleteAllButton implements GridField_HTMLProvider, GridField_Acti
             null
         );
         $button->addExtraClass('multiselect-button-delete-all');
-        if (!empty($this->buttonConfig['icon']))
-        {
+        if (!empty($this->buttonConfig['icon'])) {
             $button->setAttribute('data-icon', $this->buttonConfig['icon']);
         }
-        if (!empty($this->buttonConfig['class']))
-        {
+        if (!empty($this->buttonConfig['class'])) {
             $button->addExtraClass($this->buttonConfig['class']);
         }
         if (!empty($this->buttonConfig['confirm'])) {
@@ -78,13 +78,14 @@ class GridFieldDeleteAllButton implements GridField_HTMLProvider, GridField_Acti
 
     public function handleAction(GridField $gridField, $actionName, $arguments, $data)
     {
-        if($actionName == 'mycustomaction') {
+        if ($actionName == 'mycustomaction') {
             return $this->handleMyCustomAction($gridField, $data);
         }
     }
 
     //For accessing the custom action from the URL
-    public function getURLHandlers($gridField) {
+    public function getURLHandlers($gridField)
+    {
         return array(
             'myCustomAction' => 'handleMyCustomAction',
         );
@@ -94,25 +95,22 @@ class GridFieldDeleteAllButton implements GridField_HTMLProvider, GridField_Acti
     public function handleMyCustomAction($gridField, $data = null)
     {
         //Do your stuff here!
-        if ($data instanceof SS_HTTPRequest)
-        {
+        if ($data instanceof HTTPRequest) {
             $data = $data->requestVars();
         }
         $ids = array();
         $class = $gridField->getModelClass();
-        if (!$class) user_error('No model class is defined!');
+        if (!$class) {
+            user_error('No model class is defined!');
+        }
         $response = array();
         $this->onBeforeList($gridField, $data, $ids);
         $records = DataObject::get($class);
-        foreach ($records as $index => $record)
-        {
-            if ($record->hasExtension('Versioned'))
-            {
+        foreach ($records as $index => $record) {
+            if ($record->hasExtension('Versioned')) {
                 $record->deleteFromStage('Stage');
                 $record->deleteFromStage('Live');
-            }
-            else
-            {
+            } else {
                 $record->delete();
             }
         }
@@ -120,8 +118,14 @@ class GridFieldDeleteAllButton implements GridField_HTMLProvider, GridField_Acti
         return $response;
     }
 
-    protected function onBeforeList($gridField, $data, $idList) {}
-    protected function onEmptyList($gridField, &$response, $data, $idList) {}
+    protected function onBeforeList($gridField, $data, $idList)
+    {
+    }
+    protected function onEmptyList($gridField, &$response, $data, $idList)
+    {
+    }
 
-    protected function onAfterList($gridField, &$response, $records, $data, $idList) {}
+    protected function onAfterList($gridField, &$response, $records, $data, $idList)
+    {
+    }
 }

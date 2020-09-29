@@ -9,6 +9,8 @@ use SilverStripe\Forms\GridField\GridField_HTMLProvider;
 use SilverStripe\Forms\GridField\GridField_URLHandler;
 use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataObject;
+use Tedy\GridFieldCustom\GridFieldCheckboxSelectComponent;
+use SilverStripe\Control\HTTPRequest;
 
 /**
  *
@@ -113,7 +115,7 @@ class GridFieldApplyToMultipleRows implements GridField_HTMLProvider, GridField_
      */
     public function handleIt($gridField, $data = array())
     {
-        if ($data instanceof SS_HTTPRequest) {
+        if ($data instanceof HTTPRequest) {
             $data = $data->requestVars();
         }
 

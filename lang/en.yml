@@ -1,0 +1,8 @@
+en:
+  Tedy\GridFieldCustom\GridFieldMultiDeleteButton:
+    ButtonText: 'Delete Selected'
+    Confirm: 'Are you sure you want to delete all selected items?' 
+  Tedy\GridFieldCustom\GridFieldCheckboxSelectComponent:
+    SelectAllVisibleRows: 'Select all visible rows' 
+  Tedy\GridFieldCustom\GridFieldDeleteAllButton: 
+    Confirm: 'Are you sure you want to delete all items?' 
